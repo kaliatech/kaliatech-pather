@@ -106,6 +106,7 @@ int main(int argc, char *argv[]) {
 
     }
     catch (const std::exception& e) {
+        std::cout << "Error setting up scenario. Message: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
 
