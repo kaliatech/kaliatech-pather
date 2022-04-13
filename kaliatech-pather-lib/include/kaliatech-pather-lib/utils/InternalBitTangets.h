@@ -16,6 +16,7 @@ namespace kpath {
     class InternalBitTangets {
     public:
         InternalBitTangets(const Circle &A, const Circle &B);
+        InternalBitTangets(const Circle &A, const Circle &B,  float aRadiusInc, float bRadiusInc);
 
         float theta() {
             const float P = glm::distance(av, bv);

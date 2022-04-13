@@ -13,6 +13,13 @@ namespace kpath {
             bv{vec2(B.x, B.y)} {
     }
 
+    ExternalBitTangets::ExternalBitTangets(const Circle &A, const Circle &B,  float aRadiusInc, float bRadiusInc) :
+            ExternalBitTangets(A, B) {
+        a.r += aRadiusInc;
+        b.r += bRadiusInc;
+    }
+
+
     glm::mat2x4 ExternalBitTangets::CF() {
         return LineUtils::asMatrix(C(), F());
     }

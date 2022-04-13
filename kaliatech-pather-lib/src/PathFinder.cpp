@@ -21,13 +21,14 @@ namespace kpath {
         return a_star_search(target);
     }
 
-    void PathFinder::addSeekerPaths(const std::string &idBase, const Seeker &seeker, const Obstacle &B) {
+    void PathFinder::addSeekerPaths(const std::string &idBase, const Seeker &seeker, const Obstacle &B,
+                                    float obstacleRadiusInc) {
 
         auto &endObjPathsV = endObjPaths[B];
 
         Circle seekerC(seeker.x, seeker.y, 0);
 
-        ExternalBitTangets ebt(seekerC, B);
+        ExternalBitTangets ebt(seekerC, B, 0, obstacleRadiusInc);
         if (ebt.isValid()) {
             std::shared_ptr<Path> p1(new Path(idBase + "-ebt1", ebt.C(), ebt.F()));
             startSeekerPaths.emplace_back(p1);
@@ -39,11 +40,12 @@ namespace kpath {
         }
     }
 
-    void PathFinder::addTargetPaths(const std::string &idBase, const Obstacle &A, const Target &target) {
+    void PathFinder::addTargetPaths(const std::string &idBase, const Obstacle &A, const Target &target,
+                                    float obstacleRadiusInc) {
         auto &startObjPathsV = startObjPaths[A];
 
         Circle targetC(target.x, target.y, 0);
-        ExternalBitTangets ebt(A, targetC);
+        ExternalBitTangets ebt(A, targetC, obstacleRadiusInc, 0);
         if (ebt.isValid()) {
             std::shared_ptr<Path> p1(new Path(idBase + "-ebt1", ebt.C(), ebt.F()));
             startObjPathsV.emplace_back(p1);
@@ -53,11 +55,12 @@ namespace kpath {
         }
     }
 
-    void PathFinder::addObstaclePaths(const std::string &idBase, const Obstacle &A, Obstacle &B) {
+    void PathFinder::addObstaclePaths(const std::string &idBase, const Obstacle &A, const Obstacle &B,
+                                      float obstacleRadiusInc) {
         auto &startObjPathsV = startObjPaths[A];
         auto &endObjPathsV = endObjPaths[B];
 
-        ExternalBitTangets ebt(A, B);
+        ExternalBitTangets ebt(A, B, obstacleRadiusInc, obstacleRadiusInc);
         if (ebt.isValid()) {
             std::shared_ptr<Path> p1(new Path(idBase + "-ebt1", ebt.C(), ebt.F()));
             startObjPathsV.emplace_back(p1);
@@ -68,7 +71,7 @@ namespace kpath {
             endObjPathsV.emplace_back(p2);
         }
 
-        InternalBitTangets ibt(A, B);
+        InternalBitTangets ibt(A, B, obstacleRadiusInc, obstacleRadiusInc);
         if (ibt.isValid()) {
             auto p1 = std::make_shared<Path>(Path(idBase + "-ibt1", ibt.C(), ibt.F()));
             startObjPathsV.emplace_back(p1);
@@ -86,6 +89,10 @@ namespace kpath {
         endObjPaths.clear();
         arcPaths.clear();
 
+        // If seeker radius larger than 1, we scale obstacles up by seeker.r.  According to Amit, this is application
+        // of "Minkowski addition". This is an easy approach, but increases chances for overflows.
+        float obstacleRadiusInc = seeker.r;
+
         // Seeker directly to target
         glm::vec2 seekerNode = vec2(seeker.x, seeker.y);
         glm::vec2 targetNode = vec2(target.x, target.y);
@@ -99,10 +106,10 @@ namespace kpath {
             std::vector<std::shared_ptr<Path>> &startObjPathsV = startObjPaths[o];
 
             // Seeker path to every obstacle bittangent
-            addSeekerPaths("seekerTo-" + o.getId(), seeker, o);
+            addSeekerPaths("seekerTo-" + o.getId(), seeker, o, obstacleRadiusInc);
 
             // Every obstacle bittangent to target
-            addTargetPaths(o.getId() + "-toTarget", o, target);
+            addTargetPaths(o.getId() + "-toTarget", o, target, obstacleRadiusInc);
 
             // Every obstacle bittangent with every obstacle bittangent
             for (Obstacle o2: map.getObstacles()) {
@@ -114,7 +121,7 @@ namespace kpath {
                 }
                 std::vector<std::shared_ptr<Path>> &endObjPathsV = endObjPaths[o2];
 
-                addObstaclePaths("obj-" + o.getId() + "-to-" + o2.getId(), o, o2);
+                addObstaclePaths("obj-" + o.getId() + "-to-" + o2.getId(), o, o2, obstacleRadiusInc);
             }
         }
 
@@ -151,11 +158,12 @@ namespace kpath {
                 for (const auto &endArcAtAPath: endArcAtAPaths) {
                     //TODO:self obstacle check
                     std::shared_ptr<Path> arcPath(
-                            new Path("arc-" + obstacle.getId() + "-" + startArcAtBPath->toString() + "-" + endArcAtAPath->toString(),
+                            new Path("arc-" + obstacle.getId() + "-" + startArcAtBPath->toString() + "-" +
+                                     endArcAtAPath->toString(),
                                      startArcAtBPath->B,
                                      endArcAtAPath->A,
                                      vec2{obstacle.x, obstacle.y},
-                                     obstacle.r)
+                                     obstacle.r + obstacleRadiusInc)
                     );
                     arcPaths.emplace_back(arcPath);
                 }

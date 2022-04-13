@@ -22,23 +22,57 @@ All code is cross platform C++20. Tested:
  * Amazon Linux 2
 
 ### Install dependencies
+Install dependencies.
+
+Minimally **cmake 3.0+**, a **C++20 compiler**, Git and Git LFS.
+
+GUI requires additional dependencies on linux.
+
+On Windows, a git clone works out-of-the-box in newer versions of CLion. It _should_ also
+work on MSVC, but I did not test.
 
 ```bash
-sudo apt install cmake build-essential git
+# Basics
+sudo apt install cmake build-essential git git-lfs
 ```
-Additional dependencies might be needed for the GUI app.
+
+
 ```bash
 # In a Windows WSL2 environment with Ubuntu 20.04
 sudo apt install cmake build-essential git
 sudo apt install libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev
 ```
+
+```bash
+# In Amazon Linux 2 (where available gcc and cmake are too old)
+
+sudo yum install alsa-lib-devel mesa-libGL-devel libX11-devel libXrandr-devel libXi-devel libXcursor-devel libXinerama-devel
+
+sudo yum remove gcc.x86_64
+sudo yum install -y gcc10.x86_64 gcc10-c++.x86_64
+sudo ln -s /usr/bin/gcc10-gcc /usr/bin/gcc
+sudo ln -s /usr/bin/gcc10-g++ /usr/bin/g++
+
+sudo yum remove cmake #if installed
+sudo yum install openssl-devel #required by newer versions of cmake
+sudo yum install -y 
+wget https://cmake.org/files/v3.16/cmake-3.16.3.tar.gz
+tar -xvzf cmake-3.16.3.tar.gz
+cd cmake-3.16.3
+./bootstrap
+gmake
+sudo gmake install
+
+
+```
+
 ### Clone, Build, Execute
 ```bash
 # Clone
 git clone https://github.com/kaliatech/kaliatech-pather.git
 
 # Run cmake
-cd kaliatech-panther
+cd kaliatech-pather
 cmake -S . -B build
 
 # Run make
@@ -46,15 +80,24 @@ cd ./build
 make
 
 # Execute the console app
-cd ./kaliatech-pather-console-app
-./kaliatech-pather-console-app assets/test-map-1.json
+cd ./kaliatech-pather-app-console
+./kaliatech-pather-app-console assets/test-map-1.json
+
+# Execute the GUI app
+cd ./kaliatech-pather-app-gui
+./kaliatech-pather-app-gui assets/test-map-1.json
+
+# Workaround for Amazon Linux 2
+MESA_GL_VERSION_OVERRIDE=4.3 ./kaliatech-pather-app-gui assets/test-map-1.json
+
 ```
 
 ## Status (2020-04-13)
 
 Priorities:
  - The path finding neighbor look-up has a bug and can go in to an infinite loop.
- - Does not yet handle concept of seeker having it's own size.
+ - The path finding arc calculations are not correct.
+ - The GUI display does not draw arcs. It currently uses orange lines where there should be curves.
 
 Remaining work:
  - Refactoring to remove dependency on GLW from the static library (uses vec2 types)

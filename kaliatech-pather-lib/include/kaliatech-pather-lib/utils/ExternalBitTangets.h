@@ -17,6 +17,7 @@ namespace kpath {
     class ExternalBitTangets {
     public:
         ExternalBitTangets(const Circle &A, const Circle &B);
+        ExternalBitTangets(const Circle &A, const Circle &B, float aRadiusInc, float bRadiusInc);
 
         float theta() {
             const float P = glm::distance(av, bv);
@@ -60,6 +61,8 @@ namespace kpath {
         vec2 av;
         Circle b;
         vec2 bv;
+
+        float obstacleRadiusInc = 0;
 
     };
 

@@ -24,7 +24,7 @@ public:
     std::unique_ptr<Map> map;
 };
 
-Scenario* setup_senario2(int argc, char *argv[]) {
+Scenario* setupScenarioFromfile(int argc, char *argv[]) {
 
     if (argc < 2) {
         std::cout << "Usage: KaliatechPatherAppGui <map-file>" << std::endl;
@@ -43,7 +43,7 @@ Scenario* setup_senario2(int argc, char *argv[]) {
     }
 
     return new Scenario{
-            .seeker = Seeker(300, 300, 10),
+            .seeker = Seeker(100, 100, 10),
             .target = Target(450, 450, 10),
             .map = std::move(map)
     };
@@ -51,8 +51,8 @@ Scenario* setup_senario2(int argc, char *argv[]) {
 
 Scenario* setup_senario1() {
     Scenario*  s = new Scenario{
-            .seeker = Seeker(0, 0, 1),
-            .target = Target(500, 500, 1)
+            .seeker = Seeker(30, 40, 45),
+            .target = Target(400, 400, 10)
     };
 
     std::vector<Obstacle> obstacles;
@@ -73,7 +73,7 @@ Scenario* setup_senario1() {
 //    obstacles.emplace_back(Obstacle("o2", 250, 270, 79));
 //    obstacles.emplace_back(Obstacle("o3", 400, 100, 79));
     //obstacles.emplace_back(Obstacle("o4", 50, 500, 50));
-    obstacles.emplace_back(Obstacle("o4", 200, 300, 50));
+    obstacles.emplace_back(Obstacle("o4", 150, 300, 50));
     obstacles.emplace_back(Obstacle("o5", 340, 300, 50));
 
     s->map = std::make_unique<Map>(500, 500, obstacles);
@@ -84,24 +84,28 @@ int main(int argc, char *argv[]) {
 
     // Initialization
     //--------------------------------------------------------------------------------------
-    const int screenWidth = 500;
-    const int screenHeight = 500;
+    int screenWidth = 800;
+    int screenHeight = 600;
 
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(screenWidth, screenHeight, "KPath Tester");
+    InitWindow(screenWidth, screenHeight, "Kaliatech Pather");
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
-
-
+    SetWindowSize(GetMonitorHeight(0) / 2, GetMonitorHeight(0) / 2);
+    SetWindowPosition(GetMonitorWidth(0) / 2 - GetMonitorWidth(0) / 4, GetMonitorHeight(0) / 2 - GetMonitorHeight(0) / 4);
     std::unique_ptr<Scenario> s;
     try {
+        // Default expect file as command line argument
+        s = std::unique_ptr<Scenario>(setupScenarioFromfile(argc, argv));
+
+        // Convenient for development/testing"
         //s = std::unique_ptr<Scenario>(setup_senario1());
-        s = std::unique_ptr<Scenario>(setup_senario2(argc, argv));
+
     }
-    catch (std::exception e) {
+    catch (const std::exception& e) {
         return EXIT_FAILURE;
     }
 
@@ -155,10 +159,9 @@ int main(int argc, char *argv[]) {
                            WHITE);
         }
 
-        bool DRAW_OBSTACLE_BITTANGENTS = true;
-        bool DRAW_SEEKER_PATHS = true;
-        bool DRAW_OBSTACLE_PATHS = true;
-        bool DRAW_ARC_PATHS = true;
+        bool DRAW_SEEKER_PATHS = false;
+        bool DRAW_OBSTACLE_PATHS = false;
+        bool DRAW_ARC_PATHS = false;
         bool DRAW_PATH = true;
 
         // Draw seeker paths
@@ -218,7 +221,13 @@ int main(int argc, char *argv[]) {
         if (DRAW_PATH) {
             for (auto p: pSequence.getPaths()) {
                 glm::mat2x4 AB = p->AB() * scale;
-                DrawLineEx(Vector2{AB[0].x, AB[0].y}, Vector2{AB[1].x, AB[1].y}, 2, BLUE);
+                if (p->type == PathType::ARC) {
+                    DrawLineEx(Vector2{AB[0].x, AB[0].y}, Vector2{AB[1].x, AB[1].y}, 3, ORANGE);
+                }
+                else {
+                    DrawLineEx(Vector2{AB[0].x, AB[0].y}, Vector2{AB[1].x, AB[1].y}, 3, GREEN);
+                }
+
             }
         }
 

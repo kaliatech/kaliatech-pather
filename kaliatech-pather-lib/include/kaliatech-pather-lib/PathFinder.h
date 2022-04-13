@@ -30,9 +30,9 @@ namespace kpath {
     private:
         void buildGraph(const Map &map, const Seeker &seeker, const Target &target);
 
-        void addSeekerPaths(const std::string& idBase, const Seeker& seeker, const Obstacle &B);
-        void addTargetPaths(const std::string& idBase, const Obstacle& A, const Target &target);
-        void addObstaclePaths(const std::string& idBase, const Obstacle& A, Obstacle &B);
+        void addSeekerPaths(const std::string& idBase, const Seeker& seeker, const Obstacle &B, float obstacleRadiusInc);
+        void addTargetPaths(const std::string& idBase, const Obstacle& A, const Target &, float obstacleRadiusInc);
+        void addObstaclePaths(const std::string& idBase, const Obstacle& A, const Obstacle &B, float obstacleRadiusInc);
 
         PathSequence a_star_search(const Target& target);
         PathVector getNextNeighbors(const std::shared_ptr<Path>& lastPath);
