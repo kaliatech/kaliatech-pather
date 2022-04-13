@@ -10,7 +10,7 @@ namespace kpath {
         accumulatedLength += path->length();
     }
 
-    const std::vector<std::shared_ptr<Path>> &PathSequence::getPaths() const {
+    const PathVector &PathSequence::getPaths() const {
         return paths;
     }
 

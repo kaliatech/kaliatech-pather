@@ -3,26 +3,22 @@
 #include <string>
 #include <sstream>
 #include <glm/glm.hpp>
-#include <glm/gtx/string_cast.hpp>
 
 #include "kaliatech-pather-lib/utils/LineUtils.h"
 
 namespace kpath {
     Path::Path(std::string id, const glm::vec2 &A, const glm::vec2 &B) :
             id(std::move(id)), A(A), B(B), type(PathType::LINE) {
-
     }
 
     Path::Path(std::string id, const glm::vec2 &A, const glm::vec2 &B, const glm::vec2 &center, float arcRadius) :
             id(std::move(id)), A(A), B(B), type(PathType::ARC), center(center), arcRadius(arcRadius) {
-
     }
-
 
     std::string Path::toString() const {
         std::ostringstream str;
         //str << "id:" + id + ",A:" << glm::to_string(A) << ",B:" << glm::to_string(B);
-        str << "A:" << glm::to_string(A) << ",B:" << glm::to_string(B);
+        str << "A:" << A.x << "," << A.y  << " to B:" << B.x << "," << B.y;
         return str.str();
     }
 

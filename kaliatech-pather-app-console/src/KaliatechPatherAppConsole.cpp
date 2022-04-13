@@ -2,15 +2,42 @@
 #include <iomanip>
 #include <cstdlib>
 
-int main(int argc, char *argv[])
-{
-    std::cout << "argc == " << argc << '\n';
+#include "kaliatech-pather-lib/MapFileUtils.h"
+#include "kaliatech-pather-lib/PathFinder.h"
 
-    for(int ndx{}; ndx != argc; ++ndx) {
-        std::cout << "argv[" << ndx << "] == " << std::quoted(argv[ndx]) << '\n';
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        std::cout << "Usage: KaliatechPatherAppConsole <map-file>" << std::endl;
+        std::cerr << "Missing map-file argument" << std::endl;
+        return EXIT_FAILURE;
     }
-    std::cout << "argv[" << argc << "] == "
-              << static_cast<void*>(argv[argc]) << '\n';
-    /*...*/
-    return argc == 3 ? EXIT_SUCCESS : EXIT_FAILURE; // optional return value
+
+    std::string mapFilePath = argv[1];
+    std::unique_ptr<kpath::Map> map;
+    try {
+        map = kpath::MapFileUtils::load(mapFilePath);
+    }
+    catch (const std::exception &e) {
+        std::cerr << "Error loading map. Message: " << e.what();
+        return EXIT_FAILURE;
+    }
+
+    kpath::Seeker seeker(10, 10, 10);
+    kpath::Target target(300, 300, 10);
+
+    kpath::PathFinder pFinder;
+    kpath::PathSequence pSequence = pFinder.find(*map, seeker, target);
+
+    if (pSequence.getPaths().empty()) {
+        std::cout << "Path could not be found." << std::endl;
+        return EXIT_SUCCESS;
+    }
+
+    std::cout << "Path:" << std::endl;
+    for (const auto &path: pSequence.getPaths()) {
+        std::cout << "   " << path->toString() << std::endl;
+    }
+
+
+    return EXIT_SUCCESS;
 }

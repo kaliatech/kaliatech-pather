@@ -7,9 +7,9 @@
 
 namespace kpath {
 
-/**
- * An rectangular map with obstacles.
- */
+    /**
+     * An rectangular map with obstacles.
+     */
     class Map {
     public:
         /**
@@ -21,12 +21,11 @@ namespace kpath {
         Map(int width, int height, std::vector<Obstacle> obstacles);
 
         virtual ~Map() = default;
-
         int getWidth() const;
-
         int getHeight() const;
 
         const std::vector<Obstacle> &getObstacles() const;
+
 
     private:
         int width;

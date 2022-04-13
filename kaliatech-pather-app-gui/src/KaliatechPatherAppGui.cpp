@@ -13,25 +13,47 @@
 #include "kaliatech-pather-lib/Path.h"
 #include "kaliatech-pather-lib/PathFinder.h"
 #include "kaliatech-pather-lib/Seeker.h"
+#include "kaliatech-pather-lib/MapFileUtils.h"
 
 using namespace kpath;
 
-int main(void) {
+class Scenario {
+public:
+    Seeker seeker;
+    Target target;
+    std::unique_ptr<Map> map;
+};
 
-    // Initialization
-    //--------------------------------------------------------------------------------------
-    const int screenWidth = 500;
-    const int screenHeight = 500;
+Scenario* setup_senario2(int argc, char *argv[]) {
 
-    SetConfigFlags(FLAG_MSAA_4X_HINT);
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(screenWidth, screenHeight, "KPath Tester");
+    if (argc < 2) {
+        std::cout << "Usage: KaliatechPatherAppGui <map-file>" << std::endl;
+        std::cerr << "Missing map-file argument" << std::endl;
+        throw std::exception("Missing arguments.");
+    }
 
-    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
-    //--------------------------------------------------------------------------------------
+    std::string mapFilePath = argv[1];
+    std::unique_ptr<kpath::Map> map;
+    try {
+        map = kpath::MapFileUtils::load(mapFilePath);
+    }
+    catch (const std::exception &e) {
+        std::cerr << "Error loading map. Message: " << e.what();
+        throw std::exception("Unable to load map.");
+    }
 
-    Seeker seeker(0, 0, 1);
-    Target target(500, 500, 1);
+    return new Scenario{
+            .seeker = Seeker(300, 300, 10),
+            .target = Target(450, 450, 10),
+            .map = std::move(map)
+    };
+}
+
+Scenario* setup_senario1() {
+    Scenario*  s = new Scenario{
+            .seeker = Seeker(0, 0, 1),
+            .target = Target(500, 500, 1)
+    };
 
     std::vector<Obstacle> obstacles;
 //    obstacles.emplace_back(Obstacle(100, 100, 50));
@@ -46,6 +68,7 @@ int main(void) {
 //    obstacles.emplace_back(Obstacle("o2", 225, 200, 10));
 //    obstacles.emplace_back(Obstacle("o3", 300, 300, 40));
 
+
     obstacles.emplace_back(Obstacle("o1", 150, 150, 50));
 //    obstacles.emplace_back(Obstacle("o2", 250, 270, 79));
 //    obstacles.emplace_back(Obstacle("o3", 400, 100, 79));
@@ -53,20 +76,48 @@ int main(void) {
     obstacles.emplace_back(Obstacle("o4", 200, 300, 50));
     obstacles.emplace_back(Obstacle("o5", 340, 300, 50));
 
-    auto map = std::make_unique<Map>(500, 500, obstacles);
+    s->map = std::make_unique<Map>(500, 500, obstacles);
+    return s;
+}
+
+int main(int argc, char *argv[]) {
+
+    // Initialization
+    //--------------------------------------------------------------------------------------
+    const int screenWidth = 500;
+    const int screenHeight = 500;
+
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    InitWindow(screenWidth, screenHeight, "KPath Tester");
+
+    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
+    //--------------------------------------------------------------------------------------
+
+
+
+    std::unique_ptr<Scenario> s;
+    try {
+        //s = std::unique_ptr<Scenario>(setup_senario1());
+        s = std::unique_ptr<Scenario>(setup_senario2(argc, argv));
+    }
+    catch (std::exception e) {
+        return EXIT_FAILURE;
+    }
+
 
     //std::vector<Circle> obstacleCircles(obstacles.begin(), obstacles.end());
     //std::vector<Path> paths = buildPaths(seeker, target, obstacles);
 
     kpath::PathFinder pathFinder;
-    PathSequence pSequence = pathFinder.find(*map, seeker, target);
+    PathSequence pSequence = pathFinder.find(*s->map, s->seeker, s->target);
     if (pSequence.getPaths().empty()) {
         std::cout << "NO PATH FOUND" << std::endl;
     } else {
         std::cout << "PATH SEGMENTS:" << pSequence.getPaths().size() << std::endl;
     }
 
-    Image deathStarImg = LoadImage("deathstar.png");
+    Image deathStarImg = LoadImage("assets/deathstar.png");
     Texture2D deathStarTexture = LoadTextureFromImage(
             deathStarImg);      // Image converted to texture, uploaded to GPU memory (VRAM)
     UnloadImage(deathStarImg);
@@ -78,10 +129,10 @@ int main(void) {
         int winW = GetScreenWidth();
         int winH = GetScreenHeight();
 
-        int mapW = map->getWidth();
-        int mapH = map->getHeight();
-        float scaleW = (float) winW / map->getWidth();
-        float scaleH = (float) winH / map->getHeight();
+        int mapW = s->map->getWidth();
+        int mapH = s->map->getHeight();
+        float scaleW = (float) winW / s->map->getWidth();
+        float scaleH = (float) winH / s->map->getHeight();
         float scale = scaleW < scaleH ? scaleW : scaleH;
 
         // Draw
@@ -89,7 +140,7 @@ int main(void) {
         BeginDrawing();
 
         ClearBackground(RAYWHITE);
-        for (auto ob: map->getObstacles()) {
+        for (auto ob: s->map->getObstacles()) {
             Vector2 l = {ob.x, ob.y};
             l = Vector2Scale(l, scale);
 
@@ -171,8 +222,8 @@ int main(void) {
             }
         }
 
-        DrawCircle((int) (seeker.x * scale), (int) (seeker.y * scale), seeker.r * scale, RED);
-        DrawCircle((int) (target.x * scale), (int) (target.y * scale), target.r * scale, GREEN);
+        DrawCircle((int) (s->seeker.x * scale), (int) (s->seeker.y * scale), s->seeker.r * scale, RED);
+        DrawCircle((int) (s->target.x * scale), (int) (s->target.y * scale), s->target.r * scale, GREEN);
 
         EndDrawing();
         //----------------------------------------------------------------------------------
@@ -183,5 +234,5 @@ int main(void) {
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
 
-    return 0;
+    return EXIT_SUCCESS;
 }
