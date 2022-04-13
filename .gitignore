@@ -1,0 +1,41 @@
+# Project
+cmake-build-debug
+
+# Misc
+.DS_Store
+
+# CMake
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+
+
+# Node
+node_modules
+
+# Vue/Vite
+# dist # commented for easy publishing on github
+dist-ssr
+*.local
+
+# Log files
+*-debug.log*
+
+# VS Code and Studio
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# JetBrains IDEs
+.idea
