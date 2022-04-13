@@ -13,4 +13,4 @@ namespace kpath {
 
     typedef std::vector<std::shared_ptr<Path>> PathVector;
 }
-#endif;
+#endif
