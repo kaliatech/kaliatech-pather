@@ -1,41 +1,58 @@
 # kaliatech-pather
 
-A C++ library for 2D path finding a sphere through spherical obstacles.
+A C++ library for 2D path finding a circle through circular obstacles. Many concepts in this library are explained
+further by Amit Patel in his article:
 
-Many concepts in this library are explained further by Amit Patel in his article:
- - [Circular Obstacle Pathfinding](https://redblobgames.github.io/circular-obstacle-pathfinding/)
+- [Circular Obstacle Pathfinding](https://redblobgames.github.io/circular-obstacle-pathfinding/) - Amit Patel / Red Blob
+  Games
 
 ## Components
- * **kaliatech-pather-lib**
-   * A static C++ library. Only dependency is GLW (and that will eventually be removed.)
- * **kaliatech-pather-lib-tests**
-   * Executable unit tests.
- * **kaliatech-pather-app-console**
-   * A console app for feeding a map file to the library and getting optimal path.
+
+* **kaliatech-pather-lib**
+    * A static C++ library. Only dependency is GLW (and that will eventually be removed.)
+      <br><br>
+* **kaliatech-pather-lib-tests**
+    * Executable unit tests.
+      <br><br>
+* **kaliatech-pather-app-console**
+    * A console app for feeding a map file to the library and getting optimal path.
+      <br><br>
 * **kaliatech-pather-app-gui**
     * A GUI app for displaying map and optimal path.
 
 ## Building and Executing
-All code is cross platform C++20. Tested:
- * Windows 10 using MSVC compiler and CLion IDE.
- * Ubuntu 20.04 (on WSL2, no GUI)
- * Amazon Linux 2
+
+Code is cross platform in C++20. Tested:
+
+* Windows 10, using MSVC 2019 compiler and CLion IDE.
+* Ubuntu 20.04 (with WSL2)
+* Amazon Linux 2
 
 ### Install dependencies
-Install dependencies.
 
-Minimally **cmake 3.0+**, a **C++20 compiler**, Git and Git LFS.
+The kaliatech-path-library itself has only one non standard library dependency (GLW), and that can/should/will be
+removed. The GUI app requires additional dependencies on linux.
 
-GUI requires additional dependencies on linux.
+Minimum requirements to clone source and build:
 
-On Windows, a git clone works out-of-the-box in newer versions of CLion. It _should_ also
-work on MSVC, but I did not test.
+* **CMake 3.16+**
+* **C++20 compiler**
+* **Git**
+* **Git LFS**
+
+#### Windows
+
+Works easily in newer versions of CLion. It _should_ also work with MSVC, but I did not test.
+
+#### Linux
+
+A number of additional dependencies are needed on linux, mostly for the GUI app due to it's use
+of [raylib](https://www.raylib.com/).
 
 ```bash
 # Basics
 sudo apt install cmake build-essential git git-lfs
 ```
-
 
 ```bash
 # In a Windows WSL2 environment with Ubuntu 20.04
@@ -62,11 +79,10 @@ cd cmake-3.16.3
 ./bootstrap
 gmake
 sudo gmake install
-
-
 ```
 
 ### Clone, Build, Execute
+
 ```bash
 # Clone
 git clone https://github.com/kaliatech/kaliatech-pather.git
@@ -89,23 +105,25 @@ cd ./kaliatech-pather-app-gui
 
 # Workaround for Amazon Linux 2
 MESA_GL_VERSION_OVERRIDE=4.3 ./kaliatech-pather-app-gui assets/test-map-1.json
-
 ```
 
 ## Status (2020-04-13)
 
-Priorities:
- - The path finding neighbor look-up has a bug and can go in to an infinite loop.
- - The path finding arc calculations are not correct.
- - The GUI display does not draw arcs. It currently uses orange lines where there should be curves.
+Remaining priorities:
 
-Remaining work:
- - Refactoring to remove dependency on GLW from the static library (uses vec2 types)
- - Refactoring the graph building
- - Refactoring to allow plugable algorithms
- - Optimization, especially in the graph building
- - Testing, especially:
-   - limits testing (memory usage, out-of-bounds, number overruns, etc.)
-   - performance measurements
+- The path finding neighbor look-up has a bug and can go in to an infinite loop.
+- The path finding arc calculations are not correct.
+- The GUI display does not draw arcs. It currently uses orange lines where there should be curves.
+
+Potential tasks:
+
+- Refactoring to remove dependency on GLW from the static library (uses vec2 types)
+- Refactoring the graph building
+- Refactoring to allow pluggable search algorithms
+- Optimizations, especially in the graph building
+- Testing, especially:
+    - limits testing (memory usage, out-of-bounds, number overruns, etc.)
+    - performance measurements
+
 
 
