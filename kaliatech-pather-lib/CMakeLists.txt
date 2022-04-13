@@ -46,7 +46,7 @@ option(BUILD_DOC "Build documentation" OFF)
 find_package(Doxygen)
 if (DOXYGEN_FOUND AND BUILD_DOC)
     set( DOXYGEN_OUTPUT_DIRECTORY docs/doxygen )
-    doxygen_add_docs(doc
+    doxygen_add_docs(docs
             "${CMAKE_CURRENT_SOURCE_DIR}/include"
             "${CMAKE_CURRENT_SOURCE_DIR}/src"
             ALL
