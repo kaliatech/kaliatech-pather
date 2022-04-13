@@ -14,13 +14,13 @@ namespace kpath {
     /**
      *
      * @param filePath
-     * @throw std::exception if file does not exist
+     * @throw std::runtime_error if file does not exist
      * @return
      */
     std::unique_ptr<Map> MapFileUtils::load(const std::filesystem::path &filePath) {
 
         if (!std::filesystem::exists(filePath)) {
-            throw std::exception("File does not exist");
+            throw std::runtime_error("File does not exist");
         }
 
         std::ifstream ifs(filePath);

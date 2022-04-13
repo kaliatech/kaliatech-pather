@@ -15,7 +15,7 @@ namespace MapFileUtilsTest {
         try {
             auto map = MapFileUtils::load("test-does-not-exist.txt");
         }
-        catch (const std::exception& e) {
+        catch (const std::runtime_error& e) {
             std::string expected = e.what();
             assert(!expected.empty());
         }
@@ -25,7 +25,7 @@ namespace MapFileUtilsTest {
         std::cout << "  runTest_Load" << std::endl;
         auto map = MapFileUtils::load("assets/test-map-1.json");
         if (map->getObstacles().size() != 2) {
-            throw std::exception("Load load not as expected2.");
+            throw std::runtime_error("Load load not as expected2.");
         }
     }
 
@@ -38,12 +38,12 @@ namespace MapFileUtilsTest {
         std::filesystem::path path = "assets/test-map-save.temp";
         MapFileUtils::save(map, path);
         if (!std::filesystem::exists(path)) {
-            throw std::exception("File did not exist after save.");
+            throw std::runtime_error("File did not exist after save.");
         }
         auto newMap = MapFileUtils::load(path);
         //std::filesystem::remove(path);
         if (map.getObstacles().size() != newMap->getObstacles().size()) {
-            throw std::exception("Reloaded map different than saved map.");
+            throw std::runtime_error("Reloaded map different than saved map.");
         }
 
 

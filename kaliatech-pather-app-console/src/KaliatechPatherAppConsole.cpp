@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
     try {
         map = kpath::MapFileUtils::load(mapFilePath);
     }
-    catch (const std::exception &e) {
+    catch (const std::runtime_error &e) {
         std::cerr << "Error loading map. Message: " << e.what();
         return EXIT_FAILURE;
     }

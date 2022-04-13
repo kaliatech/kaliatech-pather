@@ -29,7 +29,7 @@ Scenario* setup_senario2(int argc, char *argv[]) {
     if (argc < 2) {
         std::cout << "Usage: KaliatechPatherAppGui <map-file>" << std::endl;
         std::cerr << "Missing map-file argument" << std::endl;
-        throw std::exception("Missing arguments.");
+        throw std::runtime_error("Missing arguments.");
     }
 
     std::string mapFilePath = argv[1];
@@ -37,9 +37,9 @@ Scenario* setup_senario2(int argc, char *argv[]) {
     try {
         map = kpath::MapFileUtils::load(mapFilePath);
     }
-    catch (const std::exception &e) {
+    catch (const std::runtime_error &e) {
         std::cerr << "Error loading map. Message: " << e.what();
-        throw std::exception("Unable to load map.");
+        throw std::runtime_error("Unable to load map.");
     }
 
     return new Scenario{
