@@ -67,7 +67,7 @@ namespace kpath {
 
     float Path::length() const {
         if (type == PathType::ARC) {
-            return std::abs(arcRadius * Angle());
+            return std::abs(arcRadius * (AngleB() - AngleA()));
         }
         return std::abs(std::sqrt(pow(B.x - A.x, 2.0f) + pow(B.y - A.y, 2.0f)));
     }
