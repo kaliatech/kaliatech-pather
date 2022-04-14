@@ -1,7 +1,7 @@
 # kaliatech-pather
 
 A C++ library for 2D path finding a circle through circular obstacles. Many concepts in this library are explained
-further by Amit Patel in his article:
+in detail by Amit Patel in his article:
 
 - [Circular Obstacle Pathfinding](https://redblobgames.github.io/circular-obstacle-pathfinding/) - Amit Patel / Red Blob
   Games
